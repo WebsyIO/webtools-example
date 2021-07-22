@@ -1,0 +1,24 @@
+{
+  "name": "webtools-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebsyIO/webtools-example.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WebsyIO/webtools-example/issues"
+  },
+  "homepage": "https://github.com/WebsyIO/webtools-example#readme",
+  "dependencies": {
+    "enigma.js": "^2.7.3",
+    "express": "^4.17.1",
+    "highcharts": "^9.1.2"
+  }
+}
