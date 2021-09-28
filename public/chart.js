@@ -47,20 +47,50 @@ class Chart {
     })    
   }
   init () {
-    if (this.options.objectId) {
-      qlikApp.getObject(this.options.objectId).then(model => {
-        this.model = model
-        this.model.on('changed', this.render.bind(this))
-        this.render()
-      })
-    }
-    else if (this.options.type) {
-      qlikApp.createSessionObject(this.createDefinition()).then(model => {
-        this.model = model
-        this.model.on('changed', this.render.bind(this))
-        this.render()
-      })
-    }
+    this.openQlikApp(this.options.appId).then(() => {
+      if (this.options.objectId) {
+        window.qlikApps[this.options.appId].getObject(this.options.objectId).then(model => {
+          this.model = model
+          this.model.on('changed', this.render.bind(this))
+          this.render()
+        })
+      }
+      else if (this.options.type) {
+        window.qlikApps[this.options.appId].createSessionObject(this.createDefinition()).then(model => {
+          this.model = model
+          this.model.on('changed', this.render.bind(this))
+          this.render()
+        })
+      }
+    })    
+  }
+  openQlikApp (appId) {
+    return new Promise((resolve, reject) => {
+      if (!window.qlikApps) {
+        window.qlikApps = {}
+      }
+      if (!window.qlikApps[appId]) {
+        const session = enigma.create({
+          schema, 
+          url: `${this.options.baseUrl}/app/${appId}`
+        })
+        
+        session.open().then(global => {
+          global.getActiveDoc().then(app => {
+            window.qlikApps[appId] = app
+            resolve()
+          }, err => {
+            return global.openDoc(appId)
+          }).then(app => { 
+            window.qlikApps[appId] = app
+            resolve()
+          })
+        })
+      }
+      else {
+        resolve()
+      }      
+    })
   }
   render () {
     this.model.getLayout().then(layout => {
@@ -78,7 +108,7 @@ class Chart {
     })
   }
   transformData (data) {
-    let output = {
+    const DEFAULTS = {
       chart: {
         type: "column"
       },
@@ -95,6 +125,7 @@ class Chart {
         "#aab9e1"
       ]
     }
+    let output = Object.assign({}, DEFAULTS, this.options.chartOptions)
     output.series = [{
       name: this.layout.qHyperCube.qDimensionInfo[0].qFallbackTitle,
       data: data.map(r => {
