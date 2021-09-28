@@ -1,1 +1,1 @@
-# webtools-example
+# An example of intregrating Qlik with Webtools
